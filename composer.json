@@ -1,0 +1,5 @@
+{
+    "require": {
+        "itigoppo/backlog-api": "^1.5"
+    }
+}
