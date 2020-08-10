@@ -56,7 +56,7 @@ foreach ($pullReqs as $pr) {
         continue;
     }
 
-    echo_json($pr);
+    echo "{$pr->issue->issueKey}:{$pr->issue->summary}"."\n";
 }
 //echo "pullReqs";
 //echo_json($pullReqs);
