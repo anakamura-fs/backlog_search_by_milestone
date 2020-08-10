@@ -52,7 +52,7 @@ foreach ($pullReqs as $pr) {
     if ($pr->status->name != "Merged"){
         continue;
     }
-    if ($pr->issue->milestone[0]->name != "MS01"){
+    if ($pr->issue->milestone[0]->name != getenv("MILESTONE_NAME")){
         continue;
     }
 
