@@ -11,25 +11,41 @@ function echo_json($it){
 
 $backlog = new Backlog(new ApiKeyConnector(getenv("SPACE_ID"), getenv("APIKEY"),'jp'));
 
-$issues = $backlog->issues->load();
-echo_json($issues);
+// $issues = $backlog->issues->load();
+// echo_json($issues);
+
+/** ログイン者 */
+$myself = $backlog->users->myself();
+// echo "myself";
+// echo_json($myself);
+
+/** チケットのステータス一覧。(プルリクの、ではない) */
+$allStatuses = $backlog->projects->statuses(getenv("PROJECT"));
+echo "allStatuses";
+echo_json($allStatuses);
 
 // milestone に所属するissue
 $milestones = $backlog->projects->versions(getenv("PROJECT"));
-echo echo_json($milestones);
+echo "milestones";
+echo_json($milestones);
 $issues = $backlog->issues->load([
     "milestoneId"=>[
         $milestones[0]->id,
     ],
 ]);
-echo echo_json($issues);
+echo "issues";
+echo_json($issues);
 
 // git repo
 $repos = $backlog->git->repositories(getenv("PROJECT"));
 // echo_json($repos);
 
-$pullReqs = array_map(function ($repo) use ($backlog){
-    return $backlog->git->pullRequests(getenv("PROJECT"), $repo->name);
+$pullReqs = array_map(function ($repo) use ($backlog, $myself){
+    return $backlog->git->pullRequests(getenv("PROJECT"), $repo->name, [
+        "createdUserId" => [$myself->id], // プルリク出した人、つまりコード書いた人
+        "count" => 100, // 上限
+    ]);
 }, $repos);
+echo "pullReqs";
 echo_json($pullReqs);
 
