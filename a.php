@@ -24,4 +24,12 @@ $issues = $backlog->issues->load([
 ]);
 echo echo_json($issues);
 
+// git repo
+$repos = $backlog->git->repositories("TP1");
+// echo_json($repos);
+
+$pullReqs = array_map(function ($repo) use ($backlog){
+    return $backlog->git->pullRequests("TP1", $repo->name);
+}, $repos);
+echo_json($pullReqs);
 
