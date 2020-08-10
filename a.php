@@ -22,19 +22,19 @@ $myself = $backlog->users->myself();
 /** チケットのステータス一覧。(プルリクの、ではない) */
 $allStatuses = $backlog->projects->statuses(getenv("PROJECT"));
 echo "allStatuses";
-echo_json($allStatuses);
+//echo_json($allStatuses);
 
 // milestone に所属するissue
 $milestones = $backlog->projects->versions(getenv("PROJECT"));
 echo "milestones";
-echo_json($milestones);
+//echo_json($milestones);
 $issues = $backlog->issues->load([
     "milestoneId"=>[
         $milestones[0]->id,
     ],
 ]);
 echo "issues";
-echo_json($issues);
+//echo_json($issues);
 
 // git repo
 $repos = $backlog->git->repositories(getenv("PROJECT"));
@@ -46,6 +46,18 @@ $pullReqs = array_map(function ($repo) use ($backlog, $myself){
         "count" => 100, // 上限
     ]);
 }, $repos);
-echo "pullReqs";
-echo_json($pullReqs);
+$pullReqs = call_user_func_array('array_merge', $pullReqs); // flatten
+echo "pr ...";
+foreach ($pullReqs as $pr) {
+    if ($pr->status->name != "Merged"){
+        continue;
+    }
+    if ($pr->issue->milestone[0]->name != "MS01"){
+        continue;
+    }
+
+    echo_json($pr);
+}
+//echo "pullReqs";
+//echo_json($pullReqs);
 
