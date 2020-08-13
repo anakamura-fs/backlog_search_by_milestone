@@ -17,14 +17,25 @@ $backlog = new Backlog(new ApiKeyConnector(getenv("SPACE_ID"), getenv("APIKEY"),
 /** ログイン者 */
 $myself = $backlog->users->myself();
 
+// milestone に所属するissue
+$milestones = $backlog->projects->versions(getenv("PROJECT"));
+$issues = $backlog->issues->load([
+    "milestoneId"=>[
+        $milestones[0]->id,
+    ],
+]);
+$issueIds = array_map(function($issue){return $issue->id;}, $issues);
+//echo_json($issueIds);
+
 // git repo
 $repos = $backlog->git->repositories(getenv("PROJECT"));
 // echo_json($repos);
 
-$pullReqs = array_map(function ($repo) use ($backlog, $myself){
+$pullReqs = array_map(function ($repo) use ($backlog, $myself, $issueIds){
     return $backlog->git->pullRequests(getenv("PROJECT"), $repo->name, [
         "createdUserId" => [$myself->id], // プルリク出した人、つまりコード書いた人
         "count" => 100, // 上限
+        "issueId"=>$issueIds,
     ]);
 }, $repos);
 $pullReqs = call_user_func_array('array_merge', $pullReqs); // flatten
