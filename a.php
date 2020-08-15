@@ -19,6 +19,10 @@ $myself = $backlog->users->myself();
 
 // milestone に所属するissue
 $milestones = $backlog->projects->versions(getenv("PROJECT"));
+$milestones = array_filter($milestones, function($milestone){
+    return $milestone->name == getenv("MILESTONE_NAME");
+});
+$milestones = array_values($milestones); // array_filterがキーを維持してしまうので、それを捨てるため
 $issues = $backlog->issues->load([
     "milestoneId"=>[
         $milestones[0]->id,
