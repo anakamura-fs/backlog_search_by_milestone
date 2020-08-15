@@ -27,6 +27,7 @@ $issues = $backlog->issues->load([
     "milestoneId"=>[
         $milestones[0]->id,
     ],
+    "count"=>100, // todo: 100件以上に備えたい。ページネーション
 ]);
 $issueIds = array_map(function($issue){return $issue->id;}, $issues);
 //echo_json($issueIds);
