@@ -1,5 +1,6 @@
 {
     "require": {
-        "itigoppo/backlog-api": "^1.6"
+        "itigoppo/backlog-api": "^1.6",
+        "ext-json": "*"
     }
 }
