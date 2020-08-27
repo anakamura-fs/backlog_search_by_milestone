@@ -37,11 +37,15 @@ $repos = $backlog->git->repositories(getenv("PROJECT"));
 // echo_json($repos);
 
 $pullReqs = array_map(function ($repo) use ($backlog, $myself, $issueIds){
-    return $backlog->git->pullRequests(getenv("PROJECT"), $repo->name, [
+    $pullReqs =  $backlog->git->pullRequests(getenv("PROJECT"), $repo->name, [
         "createdUserId" => [$myself->id], // プルリク出した人、つまりコード書いた人
         "count" => 100, // 上限
         "issueId"=>$issueIds,
     ]);
+    foreach ($pullReqs as $pr){
+        $pr->repoName = $repo->name;
+    }
+    return $pullReqs;
 }, $repos);
 $pullReqs = call_user_func_array('array_merge', $pullReqs); // flatten
 foreach ($pullReqs as $pr) {
@@ -52,7 +56,7 @@ foreach ($pullReqs as $pr) {
         continue;
     }
 
-    echo "{$pr->issue->issueKey}:{$pr->issue->summary}"."\n";
+    echo "{$pr->issue->issueKey}:{$pr->issue->summary} (repo={$pr->repoName})"."\n";
 }
 //echo "pullReqs";
 //echo_json($pullReqs);
