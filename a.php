@@ -23,12 +23,22 @@ $milestones = array_filter($milestones, function($milestone){
     return $milestone->name == getenv("MILESTONE_NAME");
 });
 $milestones = array_values($milestones); // array_filterがキーを維持してしまうので、それを捨てるため
-$issues = $backlog->issues->load([
-    "milestoneId"=>[
-        $milestones[0]->id,
-    ],
-    "count"=>100, // todo: 100件以上に備えたい。ページネーション
-]);
+$issues = [];
+for ($try_count=0; ; $try_count++){
+    $count = count($issues);
+    $issues = array_merge($issues,
+        $backlog->issues->load([
+            "milestoneId"=>[
+                $milestones[0]->id,
+            ],
+            "count"=>100,
+            "offset" => ($try_count * 100),
+        ])
+    );
+    $count2 = count($issues);
+    if ($count == $count2 ) break; // 増えなくなったら終了
+    sleep(1); // お作法
+}
 $issueIds = array_map(function($issue){return $issue->id;}, $issues);
 //echo_json($issueIds);
 
