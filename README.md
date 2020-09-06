@@ -21,7 +21,7 @@ backlog.jp で、
     * php5.6でも動くようです。後述
 * phpの composer
 
-## 使い方: search_by_milestone
+## 使い方1: search_by_milestone
 
 本題である「或るマイルストーンに属する成果(のチケット)検索」をします
 
@@ -32,11 +32,12 @@ backlog.jp で、
     * APIKEY には、backlog.jpの自分のアカウントで取得したAPI KEYを設定
         * 個人設定→API で設定画面に行けます。
             URLは https://(スペースID).backlog.jp/EditApiSettings.action
-        * ※自分以外にAPIKEYを教えるのは…お勧めしません…
         * ※APIKEYは一人で幾つでも取得できるようなので、都合に応じて新規生成すると良いと思います。
     * PROJECT と MILESTONE_NAMEもそれぞれ設定
+    * USER_ID は空、または環境変数じたいを削除(orコメント)。
+        * ※「USER_IDが設定されていれば」そのIDで(自分自身ではなく)検索するよう動作します。後述
 * search_by_milestone.shを実行します。 `sh search_by_milestone.sh` など
-* 標準出力に検索結果が出ます
+* 標準出力に検索結果(成果物)が出ます
     * 例：
         ```
         TP1-4:課題01 (repo=rep01)
@@ -45,9 +46,7 @@ backlog.jp で、
        * この状態の出力はsort,uniqされていません
     * sort , uniq , grep , sed などなどでお好みに整えてください
     
-## その他
-
-## 使い方: get_myself
+## 使い方2: get_myself
 
 「ユーザ(主に自分以外の同僚?)のアカウントのIDを調べる」手段です。
 ただし、直接調べることはbacklogの一般ユーザには出来ません。
@@ -73,10 +72,19 @@ backlog.jp で、
         ```
 * 上記JSONの`id`項目の数値が「これを実行した人のID」です。
 
-### 「ユーザ」IDの見つけ方
+## 使い方3: search_by_milestone で自分以外の情報を検索
 
-* APIKEYの所有者本人の情報なら、myselfというAPIで得られる。(今回はそのように実装している)
-* 他のAPI(チケット検索、プルリク検索など)で、本人以外の情報も得られる事があるので、それを地道にメモする。
-    * たとえば「私が発行したプルリク」なら「プルリクを受け取った人の名前とID」も出力に付加されている。
-* APIKEYの所有者が管理者なら、ユーザ一覧APIを発行できるので、参加者全員の情報が得られる。(今回未実装)
+「自分以外の、或るマイルストーンに属する成果(のチケット)検索」をします
+
+* 他のユーザに頼んで、 get_myself.sh を実行してもらいます
+    * `使い方2: get_myself` を行なってもらいます
+* その結果の`id`値を教えてもらいます
+* (自分の) search_by_milestone を実行する準備をします
+    * `使い方1: search_by_milestone` に倣います
+* それに加えて、 search_by_milestone.shを編集します
+    * USER_ID には「他のユーザのid」を設定
+    * ※「USER_IDが設定されていれば」そのIDで(自分自身ではなく)検索するよう動作します。
+* search_by_milestone.shを実行します。 `sh search_by_milestone.sh` など
+* 検索される結果は、自分ではなくそのIDのユーザについての成果物になります
+
 
