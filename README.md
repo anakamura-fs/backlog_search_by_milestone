@@ -24,13 +24,13 @@ backlog.jp で、
 ## 使い方
 
 * `compose install` します
-* run.shを編集します
+* search_by_milestone.shを編集します
     * SPACE_ID にはスペースIDを設定
     * APIKEY には、backlog.jpの自分(誰か)のアカウントで取得したAPI KEYを設定
         * 個人設定→API で設定画面に行けます。
             URLは https://(スペースID).backlog.jp/EditApiSettings.action
     * PROJECT と MILESTONE_NAMEもそれぞれ設定
-* run.shを実行します。 `sh run.sh` など
+* search_by_milestone.shを実行します。 `sh search_by_milestone.sh` など
 * 標準出力に検索結果が出ます
     * 例：
         ```

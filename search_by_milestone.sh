@@ -5,5 +5,5 @@ export APIKEY="yyy"
 export PROJECT="PPP"
 export MILESTONE_NAME="MS"
 
-php a.php
+php search_by_milestone.php
 
