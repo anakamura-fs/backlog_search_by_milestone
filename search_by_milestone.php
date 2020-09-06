@@ -14,7 +14,12 @@ $backlog = new Backlog(new ApiKeyConnector(getenv("SPACE_ID"), getenv("APIKEY"),
 // $issues = $backlog->issues->load();
 // echo_json($issues);
 
-$target_user = $backlog->users->myself();
+if (getenv("USER_ID")){
+    $target_user = new stdClass();
+    $target_user->id = getenv("USER_ID");
+} else {
+    $target_user = $backlog->users->myself();
+}
 
 // milestone に所属するissue
 $milestones = $backlog->projects->versions(getenv("PROJECT"));
