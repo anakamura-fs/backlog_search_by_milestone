@@ -18,12 +18,14 @@ backlog.jp で、
     * linuxとか git for windowsに付属のbashとかで使えると思います。
 * php (7.x)
     * (windowsの`scoop`などでインストールしたphpで動きました)
+    * php5.6でも動くようです。後述
 * phpの composer
 
 
 ## 使い方
 
 * `compose install` します
+    * php5.6の場合は、`composer update`してください(ライブラリ依存関係を見直す)
 * search_by_milestone.shを編集します
     * SPACE_ID にはスペースIDを設定
     * APIKEY には、backlog.jpの自分(誰か)のアカウントで取得したAPI KEYを設定
