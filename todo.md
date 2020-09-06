@@ -9,6 +9,6 @@
 * [x] php5.6でも(composer updateすれば)いける、と書く
 * [x] myselfという変数名は不味い
 * get_myself スクリプト
-    * 使い方
+    * [x] 使い方
     * 実行結果を活用する仕組を作る
 
