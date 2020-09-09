@@ -6,5 +6,7 @@ export PROJECT="PPP"
 export MILESTONE_NAME="MS"
 # export USER_ID="12345"
 
+php get_the_user.php
+echo
 php search_by_milestone.php
 
