@@ -33,7 +33,8 @@ function okawari($max_count_per_once, callable $okawari_func){
     return $result;
 }
 
-$backlog = new Backlog(new ApiKeyConnector(getenv("SPACE_ID"), getenv("APIKEY"),'jp'));
+$backlog = new Backlog(new ApiKeyConnector(getenv("SPACE_ID"), getenv("APIKEY"),
+	getenv('BACKLOG_DOMAIN')?:'com'));
 
 // $issues = $backlog->issues->load();
 // echo_json($issues);

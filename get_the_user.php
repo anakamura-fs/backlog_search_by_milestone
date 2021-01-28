@@ -8,7 +8,8 @@ function echo_json($it){
     echo json_encode($it, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
 }
 
-$backlog = new Backlog(new ApiKeyConnector(getenv("SPACE_ID"), getenv("APIKEY"),'jp'));
+$backlog = new Backlog(new ApiKeyConnector(getenv("SPACE_ID"), getenv("APIKEY"),
+	getenv('BACKLOG_DOMAIN')?:'com'));
 
 // $issues = $backlog->issues->load();
 // echo_json($issues);

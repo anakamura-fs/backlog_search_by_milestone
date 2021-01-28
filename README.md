@@ -36,6 +36,8 @@ backlog.jp で、
     * PROJECT と MILESTONE_NAMEもそれぞれ設定
     * USER_ID は空、または環境変数じたいを削除(orコメント)。
         * ※「USER_IDが設定されていれば」そのIDで(自分自身ではなく)検索するよう動作します。後述
+    * BACKLOG_DOMAIN は、お使いのbacklogのURLが「backlog.jp」なら`jp`を、「backlog.com」なら`com`を、設定してください。
+      (デフォルト=`com`)
 * search_by_milestone.shを実行します。 `sh search_by_milestone.sh` など
 * 標準出力に検索結果(成果物)が出ます
     * 例：
