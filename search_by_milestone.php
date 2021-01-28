@@ -143,16 +143,30 @@ $pullReqs = array_map(function ($repo) use ($backlog, $target_user, $issueIds){
     return $pullReqs;
 }, $repos);
 $pullReqs = call_user_func_array('array_merge', $pullReqs); // flatten
-foreach ($pullReqs as $pr) {
+$pullReqs = array_filter($pullReqs, function ($pr) use ($issues){
     if ($pr->status->name != "Merged"){
-        continue;
+        return false;
     }
+    // echo_json($pr);
     // プルリクのチケットに直接マイルストンが書いてあったら照合する
-    // プルリクのチケットに書いてない(親にはマイルストンが書いてる)なら照合しない
-    if ($pr->issue->milestone && $pr->issue->milestone[0]->name != getenv("MILESTONE_NAME")){
-        continue;
+    if ($pr->issue->milestone && $pr->issue->milestone[0]->name === getenv("MILESTONE_NAME")){
+        return true;
     }
 
+    // プルリクのチケットに書いてない(親にはマイルストンが書いてる)なら照合しない
+    if (!$pr->issue->milestone){
+        $parentIssueId = $pr->issue->parentIssueId;
+        if (isset($issues[$parentIssueId])){
+            $parentIssue = $issues[$parentIssueId];
+            if ($parentIssue->milestone[0]->name === getenv("MILESTONE_NAME")){
+                return true;
+            }
+        }
+    }
+
+    return false;
+});
+foreach ($pullReqs as $pr) {
     echo "{$pr->issue->issueKey}:{$pr->issue->summary} (repo={$pr->repoName})"."\n";
 }
 //echo "pullReqs";
