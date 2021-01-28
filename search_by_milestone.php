@@ -33,6 +33,27 @@ function okawari($max_count_per_once, callable $okawari_func){
     return $result;
 }
 
+/**
+ * 配列を連想配列にする。元の配列の各要素からキーを作り、連想配列化して返します。
+ *
+ * 注：array_mergeは、
+ * 連想配列を「キー後勝ち」で混ぜます。
+ * つまり重複キーを期待通り除外されます。
+ *
+ * @param E[] $ary 元の配列。これのキーは最終的に無視されます。
+ * @param callable $index_func 元の配列の各要素からキーを算出する関数。
+ * `func(E): string`
+ * @return array 元の各要素とキーを使って作った連想配列。
+ * `Map<string, E>`
+ */
+function array_index(array $ary, callable $index_func){
+    $result = [];
+    foreach ($ary as $elm){
+        $result[$index_func($elm)] = $elm;
+    }
+    return $result;
+}
+
 $backlog = new Backlog(new ApiKeyConnector(getenv("SPACE_ID"), getenv("APIKEY"),
 	getenv('BACKLOG_DOMAIN')?:'com'));
 
@@ -62,7 +83,43 @@ $issues = okawari(100, function ($try_count=0) use ($backlog, $milestones){
         "offset" => ($try_count * 100),
     ]);
 });
-$issueIds = array_map(function($issue){return $issue->id;}, $issues);
+// [id1=>要素1, id2=>要素2, ...] という構造に変換
+$issues = array_index($issues, function ($issue){return $issue->id;});
+
+// 「マイルストンが合致する親課題」だけ狙い撃ち
+$parentIssues = okawari(100, function ($try_count=0) use ($backlog, $milestones){
+    if ($try_count>0) sleep(1); // お作法
+    return $backlog->issues->load([
+        "milestoneId"=>[
+            $milestones[0]->id,
+        ],
+        "parentChild"=>4, // parent issues only
+        "count"=>100,
+        "offset" => ($try_count * 100),
+    ]);
+});
+foreach ($parentIssues as $parent){
+    // 上で見つけた親課題の子課題(マイルストンは同じとは限らない)を検索
+    $childIssues = okawari(100, function ($try_count=0) use ($backlog, $parent){
+        if ($try_count>0) sleep(1); // お作法
+        return $backlog->issues->load([
+            "parentChild"=>2, // child issues only
+            "parentIssueId"=>[
+                $parent->id,
+            ],
+            "count"=>100,
+            "offset" => ($try_count * 100),
+        ]);
+    });
+    // [id1=>要素1, id2=>要素2, ...] という構造に変換
+    $childIssues = array_index($childIssues, function ($issue){return $issue->id;});
+    // 追加。ただしid重複は(連想配列なので自動的に)除外
+    // 整数風キーの連想配列でarray_mergeを使うとキーが消えてしまうので、`+`演算子のほうが良い。
+    $issues += $childIssues;
+}
+// echo_json($issues);
+
+$issueIds = array_keys($issues); // キーが issue id
 //echo_json($issueIds);
 
 // git repo
@@ -90,7 +147,9 @@ foreach ($pullReqs as $pr) {
     if ($pr->status->name != "Merged"){
         continue;
     }
-    if ($pr->issue->milestone[0]->name != getenv("MILESTONE_NAME")){
+    // プルリクのチケットに直接マイルストンが書いてあったら照合する
+    // プルリクのチケットに書いてない(親にはマイルストンが書いてる)なら照合しない
+    if ($pr->issue->milestone && $pr->issue->milestone[0]->name != getenv("MILESTONE_NAME")){
         continue;
     }
 
